@@ -27,24 +27,72 @@ mongoimport
 
 # Steps
 
-Test for one shapefile
+## Test for one shapefile
 
-gis_osm_landuse_a_free_1.shp
+`gis_osm_landuse_a_free_1.shp`
 
-ogr2ogr -explodecollections -skipfailures -f GeoJSONSeq gis_osm_landuse_a_free_1.json gis_osm_landuse_a_free_1.shp
+```
+cd /Users/emilzegers/sampledata/sweden-latest-free.shp
+
+rm -rf gis_osm_landuse_a_free_1.json
+
+ogr2ogr -explodecollections -skipfailures -simplify .1 -makevalid -lco COORDINATE_PRECISION=5 -f GeoJSONSeq gis_osm_landuse_a_free_1.json gis_osm_landuse_a_free_1.shp
+```
+
+using options like `-explodecollections -skipfailures -simplify .1 -makevalid -lco COORDINATE_PRECISION=5` ensures valid geometries as result (ther are quite a few reasons why MongoDB while complain, not on ingest but when ceratiung 2dsphere indexes), and limits data volume with factor x3-x6.
+
+```
+wc -l gis_osm_landuse_a_free_1.json
+ 1031098 gis_osm_landuse_a_free_1.json
+
+mongoimport --uri mongodb://127.0.0.1:27017/osm --collection sweden.landuse --file gis_osm_landuse_a_free_1.json --type json
+```
+
+Explore data with MongoDB Compass / shell. Check that `{'properties.fclass': 'forest'}` is ~43% (depeneding on sample).
+
+Create 2dsphere index, I prefer to call the first one `geometry`.
+
+Issues
+
+db["sweden.landuse"].deleteMany({})
+
+Create 2dsphere index on empty collection
+
+No longer use `--drop`
+
+Some thingies with mongoimport... Reports wrong number of imported documents
+
+```
+8 ], [ 14.74309, 63.15218 ], [ 14.7485, 63.14822 ], [ 14.73652, 63.14187 ] ]
+2022-01-22T02:57:04.524+0100    [########################] osm.sweden.landuse   311MB/311MB (100.0%)
+2022-01-22T02:57:04.524+0100    imported 1031098 documents
+```
+
+But works for this purpose
+
+```
+mongoimport --version
+mongoimport version: r4.0.20
+git version: e2416422da84a0b63cde2397d60b521758b56d1b
+Go version: go1.11.13
+   os: darwin
+   arch: amd64
+   compiler: gc
+```
+
+```
+db["sweden.landuse"].countDocuments()
+1030545
+```
 
 
-Run for all
+## Run for all
 
 For s in *.shp
 Convert geojsonseq
 
-
 For s in *.json
 Mongoimport
-
-
-
 
 # Notes
 
