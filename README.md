@@ -83,6 +83,9 @@ Go version: go1.11.13
 ```
 db["sweden.landuse"].countDocuments()
 1030545
+
+db["sweden.landuse"].find({'properties.fclass': 'forest'}).count()
+431027
 ```
 
 
