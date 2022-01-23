@@ -36,21 +36,28 @@ cd /Users/emilzegers/sampledata/sweden-latest-free.shp
 
 rm -rf gis_osm_landuse_a_free_1.json
 
-ogr2ogr -explodecollections -skipfailures -simplify .1 -makevalid -lco COORDINATE_PRECISION=5 -f GeoJSONSeq gis_osm_landuse_a_free_1.json gis_osm_landuse_a_free_1.shp
+ogr2ogr -skipfailures -makevalid -f GeoJSONSeq gis_osm_landuse_a_free_1.json gis_osm_landuse_a_free_1.shp
+
+mongoimport --uri mongodb://127.0.0.1:27017/osm --collection sweden.landuse --file gis_osm_landuse_a_free_1.json --type json
+
 ```
 
-using options like `-explodecollections -skipfailures -simplify .1 -makevalid -lco COORDINATE_PRECISION=5` ensures valid geometries as result (ther are quite a few reasons why MongoDB while complain, not on ingest but when ceratiung 2dsphere indexes), and limits data volume with factor x3-x6.
+Skip using options `-explodecollections -simplify .1 -makevalid -lco COORDINATE_PRECISION=5`
+
+Do use options `-skipfailures -makevalid` to ensure valid geometries as result.
 
 ```
 wc -l gis_osm_landuse_a_free_1.json
  1031098 gis_osm_landuse_a_free_1.json
-
-mongoimport --uri mongodb://127.0.0.1:27017/osm --collection sweden.landuse --file gis_osm_landuse_a_free_1.json --type json
 ```
 
 Explore data with MongoDB Compass / shell. Check that `{'properties.fclass': 'forest'}` is ~43% (depeneding on sample).
 
 Create 2dsphere index, I prefer to call the first one `geometry`.
+
+Without index commands like near fail:
+
+` planner returned error :: caused by :: unable to find index for $geoNear query, full error: {'ok': 0.0, 'errmsg': 'error processing query: ns=osm.sweden.roads limit=5Tree: GEONEAR  field=geometry maxdist=1000 isNearSphere=0\nSort: {}\nProj: {}\n planner returned error :: caused by :: unable to find index for $geoNear query', 'code': 291, 'codeName': 'NoQueryExecutionPlans'}`
 
 Issues
 
@@ -82,21 +89,32 @@ Go version: go1.11.13
 
 ```
 db["sweden.landuse"].countDocuments()
-1030545
 
 db["sweden.landuse"].find({'properties.fclass': 'forest'}).count()
-431027
+
+db["sweden.landuse"].find({'properties.fclass': 'forest','properties.name': {$ne : null}}).count()
 ```
 
-Run the notebook inside VS Code or using `python3 -m jupyter notebook`
+```
+ogr2ogr -skipfailures -makevalid -f GeoJSONSeq gis_osm_roads_free_1.json gis_osm_roads_free_1.shp
 
-## Run for all
+mongoimport --uri mongodb://127.0.0.1:27017/osm --collection sweden.roads --file gis_osm_roads_free_1.json --type json
+```
+
+## Run for all shapefiles
+
+Dummy...
 
 For s in *.shp
 Convert geojsonseq
 
 For s in *.json
 Mongoimport
+
+# Notebook
+
+Run the notebook inside VS Code or using `python3 -m jupyter notebook`
+
 
 # Notes
 
