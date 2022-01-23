@@ -88,6 +88,7 @@ db["sweden.landuse"].find({'properties.fclass': 'forest'}).count()
 431027
 ```
 
+Run the notebook inside VS Code or using `python3 -m jupyter notebook`
 
 ## Run for all
 
