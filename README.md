@@ -42,7 +42,7 @@ ogr2ogr -skipfailures -makevalid -f GeoJSONSeq gis_osm_landuse_a_free_1.json gis
 mongoimport --uri mongodb://127.0.0.1:27017/osm --collection sweden.landuse --file gis_osm_landuse_a_free_1.json --type json
 ```
 
-Don't use options `-explodecollections -simplify .1 -lco COORDINATE_PRECISION=5`. It is not necessary to split MULT* geometries with `-explodecollections` as MongoDB can handle these structures. Using `-simplify .1 -lco COORDINATE_PRECISION=5` distorts the data too much resulting in less accurate and less appealing visualisations.
+Don't use options `-explodecollections -simplify .1 -lco COORDINATE_PRECISION=5`. It is not necessary to split MULTI* geometries with `-explodecollections` as MongoDB can handle these structures. Using `-simplify .1 -lco COORDINATE_PRECISION=5` distorts the data too much resulting in less accurate and less appealing visualisations.
 
 Do use options `-skipfailures -makevalid` to ensure valid geometries as result.
 
