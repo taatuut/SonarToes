@@ -1,14 +1,13 @@
 # SonarToes
-Yes, the anagram addict strikes again
-
-Stora Enso
+What's in a repo name? So far not too much, this repo is just another exercise with geospatial data and tools.
+For those cases when you don't have a proper product name at hand, just let Hermes, the ancient Greek god of science, art, speech, eloquence, writing and a few things more be your guide to come up with something. This time it was SonarToes, thanks Hermes.
 
 # Data
 Get OSM data for Sweden in Esri Shapefile format fromn http://download.geofabrik.de/europe/sweden.html
 
 Direct link http://download.geofabrik.de/europe/sweden-latest-free.shp.zip
 
-Unzip zip file to a folder
+Unzip zip file to a folder.
 
 # Prereqs
 Assumes installed:
